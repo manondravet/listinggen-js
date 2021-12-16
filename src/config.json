@@ -2,19 +2,27 @@
     "domainid": "public",
     "datasetid": "res_equipements_2017",
     "filters": ["gestiontypeproprietaireprinclib", "equipementtypelib"],
-    "axex": "naturelibelle",
+    
     "fieldTitle": "insnom",
     "fieldType": "equipementtypelib",
-    "title": "Répartition par nature d'équipement",
+    
     "charts": [{
-            "chartCreate": "newChart1",
+            "title": "Répartition par nature d'équipement",
+            "axex": "naturelibelle",
             "id": "myChart1",
             "type": "bar"
         },
         {
-            "chartCreate": "newChart2",
+            "title": "Répartition par gestionnaire",
+            "axex": "gestiontypeproprietaireprinclib",
             "id": "myChart2",
             "type": "pie"
+        },
+        {
+            "title": "Répartition par type",
+            "axex": "equipementtypelib",
+            "id": "myChart3",
+            "type": "line"
         }
     ]
 }

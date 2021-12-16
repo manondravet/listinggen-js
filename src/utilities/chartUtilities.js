@@ -26,14 +26,7 @@ const createChart = (chartId, resagg, title, axex, chartType) => {
                 ],
                 borderWidth: 1,
             }, ],
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true,
-                },
-            },
-        },
+        }
     });
     // console.log(myChart);
     return myChart;

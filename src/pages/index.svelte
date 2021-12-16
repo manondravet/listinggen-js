@@ -5,12 +5,14 @@
   import { debounce } from "lodash";
   import config from "../config.json";
   import Select from "svelte-select";
+import { onMount } from "svelte";
+import helpers from "chart.js/helpers/helpers"
 
   let search;
   let records = [];
   let errorMsg;
   let links = [];
-  let myChart = undefined;
+  let charts = {};
   let categories = {};
   let activeFilter = {};
   let category = [];
@@ -57,24 +59,43 @@
           config.domainid,
           config.datasetid,
           search,
-          config.axex,
-          activeFilter,
-          chart.id,
-          chart.type
+          chart.axex,
+          activeFilter
         )
         .then((resagg) => {
-          if (myChart == undefined) {
-            myChart = chartUtilities.createChart(
+          if (charts[chart.id] == undefined) {
+            charts[chart.id] = chartUtilities.createChart(
               chart.id,
               resagg,
-              config.title,
-              config.axex,
+              chart.title,
+              chart.axex,
               chart.type
             );
-            console.log(myChart);
-
+            console.log(charts[chart.id]);
+            charts[chart.id].options.onClick = function (e, items) {
+                const canvasPosition = helpers.getRelativePosition(e, charts[chart.id]);
+                if ('x' in charts[chart.id].scales) {
+                  const dataX = charts[chart.id].scales.x.getValueForPixel(canvasPosition.x);
+                  const label = charts[chart.id].scales.x.getLabelForValue(dataX);
+                  console.log(`${label} ${dataX}`);
+                  if (activeFilter[chart.axex] == label) {
+                    delete activeFilter[chart.axex];
+                  } else {
+                    activeFilter[chart.axex] = label;
+                  }
+                  debouncedRefresh();
+                } else {
+                  const label = charts[chart.id].data.labels[items[0].index];
+                  if (activeFilter[chart.axex] == label) {
+                    delete activeFilter[chart.axex];
+                  } else {
+                    activeFilter[chart.axex] = label;
+                  }
+                  debouncedRefresh();
+                }
+            }
           } else {
-            chartUtilities.updateChart(myChart, resagg, config.axex);
+            chartUtilities.updateChart(charts[chart.id], resagg, chart.axex);
           }
           errorMsg = undefined;
         })
@@ -106,7 +127,9 @@
       });
   };
 
-  debouncedRefresh();
+  onMount(() => {
+    debouncedRefresh();
+  })
 
   const manageFilter = (event) => {
     //  event.detail : { 'id' : 'valeur sélectionnée' }
@@ -150,6 +173,7 @@
   {#if errorMsg}
     {errorMsg}
   {/if}
+
   <div class="chart-container">
     {#each config.charts as chart}
       {chart.id}
